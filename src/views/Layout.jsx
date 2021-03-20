@@ -1,17 +1,11 @@
-import React from 'react';
+import React from "react";
 
-const Layout = ({
-                  pageName, menu, children
-                }) => {
+const Layout = ({ pageName, menu, children }) => {
   return (
     <main className={`${pageName} layout`}>
-      <nav>
-        { menu }
-      </nav>
+      <nav>{menu}</nav>
 
-      <section>
-        { children }
-      </section>
+      <section>{children}</section>
     </main>
   );
 };

@@ -1,40 +1,45 @@
 import React, { Component } from 'react';
-import ConnectedView from './ConnectedView';
-import {fetchLaunchesIfNeeded} from "../actions/Launches";
+import { connect } from 'react-redux';
+
+import { fetchLaunchesIfNeeded } from '../actions/Launches';
 import Launch from '../components/Launch';
 
 class LaunchesView extends Component {
   componentDidMount() {
-    const { dispatch, launchesCollection } = this.props;
-    fetchLaunchesIfNeeded({ dispatch, launchesCollection });
+    const { fetchLaunches } = this.props;
+    fetchLaunches();
   }
 
   getContent() {
-    const { launchCollection } = this.props;
+    const { launchReducer } = this.props;
 
-    if (!launchCollection || launchCollection.fetching) {
+    if (!launchReducer || launchReducer.fetching) {
       return <div> LOADING </div>;
     }
 
-    if (!launchCollection.launches.length) {
+    if (!launchReducer.launches.length) {
       return <div> NO DATA </div>;
     }
 
-    let launches = [];
+    return <ul>{this.renderLaunches()}</ul>;
+  }
 
-    for (let i = 0; i < launchCollection.launches.length; i++) {
-      const launch = launchCollection.launches[i];
+  renderLaunches() {
+    const { launchReducer } = this.props;
 
-      launches.push(
-        <Launch {...{
-          key: launch.launch_id,
-          launch
-        }} />
+    return launchReducer.launches.map(launch => {
+      const isSelected = launchReducer.active === launch.flight_number;
 
-      )
-    }
-
-    return <ul>{launches}</ul>;
+      return (
+        <Launch
+          {...{
+            key: launch.flight_number,
+            isSelected,
+            launch
+          }}
+        />
+      );
+    });
   }
 
   render() {
@@ -47,4 +52,13 @@ class LaunchesView extends Component {
   }
 }
 
-export default ConnectedView(LaunchesView, 'launches');
+const mapStateToProps = state => ({ launchReducer: state.launchReducer });
+
+const mapDispatchToProps = dispatch => ({
+  fetchLaunches: () => dispatch(fetchLaunchesIfNeeded())
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LaunchesView);

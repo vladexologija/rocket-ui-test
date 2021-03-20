@@ -1,8 +1,9 @@
-import LaunchService from '../services/LaunchService';
+import api from '../services/API';
 
 export const ACTIONS = {
   REQUEST_LAUNCHES: 'REQUEST_LAUNCHES',
-  RECEIVE_LAUNCHES: 'RECEIVE_LAUNCHES'
+  RECEIVE_LAUNCHES: 'RECEIVE_LAUNCHES',
+  SET_ACTIVE_LAUNCH: 'SET_ACTIVE_LAUNCH'
 };
 
 export const requestLaunches = () => ({
@@ -16,12 +17,23 @@ const receiveLaunches = response => ({
   }
 });
 
-export const fetchLaunches = dispatch => {
-  dispatch(requestLaunches());
-  return LaunchService.get().then(response => dispatch(receiveLaunches(response)));
+export const setActiveLaunch = launch => {
+  return {
+    type: ACTIONS.SET_ACTIVE_LAUNCH,
+    payload: {
+      launch
+    }
+  }
 };
 
-const shouldFetchLaunches = launchCollection => !launchCollection || !launchCollection.fetching;
+export const fetchLaunches = () => dispatch => {
+  dispatch(requestLaunches());
+  return api.getLaunches().then(response => dispatch(receiveLaunches(response)));
+};
 
-export const fetchLaunchesIfNeeded = ({ dispatch, launchCollection }) =>
-  shouldFetchLaunches(launchCollection) && fetchLaunches(dispatch);
+const shouldFetchLaunches = launchReducer => !launchReducer || !launchReducer.fetching;
+
+export const fetchLaunchesIfNeeded = () => (dispatch, getState) => {
+  const { launchReducer } = getState()
+  return shouldFetchLaunches(launchReducer)  && dispatch(fetchLaunches());
+}

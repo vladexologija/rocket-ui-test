@@ -1,17 +1,19 @@
 import React from 'react';
 import {
-  BrowserRouter as Router,
-  Route
+  Switch,
+  BrowserRouter as Router
 } from 'react-router-dom';
 import Launches from './views/Launches';
+import AppRoute from './components/AppRoute';
 
 const Routes = () => (
-  <Router>
-    <div>
-      <Route exact path="/" component={Launches}/>
-      <Route path="/Launches" component={Launches}/>
-    </div>
-  </Router>
+  <div>
+    <Router>
+      <Switch>
+        <AppRoute path="/" component={Launches}/>
+      </Switch>
+    </Router>
+  </div>
 );
 
 export default Routes;
